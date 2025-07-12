@@ -196,10 +196,19 @@ class Ota:
 
             # 更新WebSocket URL
             if "url" in websocket_info:
-                self.config.update_config(
-                    "SYSTEM_OPTIONS.NETWORK.WEBSOCKET_URL", websocket_info["url"]
-                )
-                self.logger.info(f"WebSocket URL已更新: {websocket_info['url']}")
+                if not self.config.get_config("SYSTEM_OPTIONS.NETWORK.USE_CONFIG_WEBSOCKET_URL"):
+                    self.config.update_config(
+                        "SYSTEM_OPTIONS.NETWORK.WEBSOCKET_URL", websocket_info["url"]
+                    )
+                    self.logger.info(f"WebSocket URL已更新: {websocket_info['url']}")
+                else:
+                    #强制使用本地配置的WebSocket URL
+                    websocket_info["url"] = self.config.get_config(
+                        "SYSTEM_OPTIONS.NETWORK.WEBSOCKET_URL"
+                    )
+                    self.logger.info(
+                        f"强制使用本地配置的WebSocket URL: {websocket_info['url']}"
+                    )
 
             # 更新WebSocket Token
             token_value = websocket_info.get("token", "test-token") or "test-token"
